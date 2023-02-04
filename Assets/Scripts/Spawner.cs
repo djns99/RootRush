@@ -4,7 +4,8 @@ using UnityEngine;
 
 public class Spawner : MonoBehaviour
 {
-    public float spawnsPerSecond = 0.5f; // Num items per second
+    public float spawnsPerSecond = 2.0f; // Num items per second
+    public float goodChance = 0.5f;
     public float spawnedObjectSpeed = 4.0f;
     private float coolDown = 0;
     public float borderPercent = 0.1f;
@@ -44,7 +45,7 @@ public class Spawner : MonoBehaviour
         if ( roll < 1.0f && coolDown <= 0.0f )
         {
             GameObject obj;
-            bool goodGuy = Random.Range(0, 2) == 0;
+            bool goodGuy = Random.Range(0.0f, 1.0f) <= goodChance;
             if (goodGuy)
                 obj = Instantiate(goodGuyPrefab);
             else

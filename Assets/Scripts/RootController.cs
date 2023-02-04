@@ -16,6 +16,8 @@ public class RootController : MonoBehaviour
     public float speed = 0.1f;
     public float colliderHeight = 0.1f;
 
+    public HealthBar healthBar;
+
     private float finalWidth;
     private float[] targetPercentage;
     private float lowPassFilterFactor;
@@ -23,6 +25,8 @@ public class RootController : MonoBehaviour
     private float totalRootLength;
     private float stepSize;
     private int newestIndex = 0;
+
+
 
     [Serializable]
     public struct Point
@@ -165,6 +169,27 @@ public class RootController : MonoBehaviour
         LineRenderer renderer = GetComponent<LineRenderer>();
         renderer.SetPositions(positions);
         var newPos = new Vector3(newX, transform.position.y, transform.position.z);
+        Vector2 direction = (newPos - transform.position).normalized;
+        float angle = Mathf.Atan2(direction.y, direction.x) * Mathf.Rad2Deg;
+
+        int steps = (int)(colliderHeight / stepSize);
+        float colliderWidth = renderer.widthCurve.Evaluate((float)steps / (numPositions-1));
+
+        Vector3 tipPos = positions[positions.Length - 1];
+        Vector3 backPos = positions[positions.Length - 1 - steps];
+        Vector3 pointToBack = tipPos - backPos;
+
+        Vector3 perp = Vector3.Cross(pointToBack, Vector3.forward).normalized;
+        Vector3 rightTri = pointToBack + perp * colliderWidth / 2;
+        Vector3 leftTri = pointToBack - perp * colliderWidth / 2;
+
+
+        GetComponent<PolygonCollider2D>().points = new Vector2[] { 
+            leftTri,
+            Vector2.zero, 
+            rightTri, 
+        };
+
         transform.position = newPos;
         //renderer.widthCurve = curve;
 
@@ -209,10 +234,14 @@ public class RootController : MonoBehaviour
     {
         Debug.Log("Hit");
         Debug.Log(collider.gameObject.tag);
-        //if (collider.gameObject.tag == "Loot")
-        //{
-        //    transform.Rotate(Vector3.forward * 30);
-        //}
+        if (collider.gameObject.tag == "Loot")
+        {
+            healthBar.Fertilize();
+        }
+        else if (collider.gameObject.tag == "Bug")
+        {
+            healthBar.Damage();
+        }
         Destroy(collider.gameObject);
     }
 }
