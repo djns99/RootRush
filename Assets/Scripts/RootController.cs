@@ -170,8 +170,8 @@ public class RootController : MonoBehaviour
 
             for (int outIdx = invertedNewIndex; outIdx <= invertedOldIndex; outIdx++)
             {
-                float t = (outIdx - invertedNewIndex) / (invertedOldIndex - invertedNewIndex);
-                positions[outIdx] = new Vector3(Mathf.Lerp(newer.x, older.x, (float)outIdx / (invertedOldIndex - invertedNewIndex)), startHeight + outIdx * stepSize, 0.0f);
+                float t = (float)(outIdx - invertedNewIndex) / (invertedOldIndex - invertedNewIndex);
+                positions[outIdx] = new Vector3(Mathf.Lerp(newer.x, older.x, t), startHeight + outIdx * stepSize, 0.0f);
             }
 
             //Keyframe frame = new Keyframe((float)invertedNewIndex / (numPositions - 1), newer.width * targetPercentage[invertedNewIndex]);
@@ -180,12 +180,12 @@ public class RootController : MonoBehaviour
             //curve.AddKey(frame);
         }
 
-
+        Debug.Log(positions);
 
         renderer.SetPositions(positions);
-        var newPos = new Vector3(newX, transform.position.y, transform.position.z);
-        Vector2 direction = (newPos - transform.position).normalized;
-        float angle = Mathf.Atan2(direction.y, direction.x) * Mathf.Rad2Deg;
+        //var newPos = new Vector3(newX, transform.position.y, transform.position.z);
+        //Vector2 direction = (newPos - transform.position).normalized;
+        //float angle = Mathf.Atan2(direction.y, direction.x) * Mathf.Rad2Deg;
 
         int steps = (int)(colliderHeight / stepSize);
 

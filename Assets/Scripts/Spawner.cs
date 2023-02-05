@@ -14,10 +14,11 @@ public class Spawner : MonoBehaviour
     public GameObject badGuyPrefab;
     public Camera cameraView;
 
+    private float spawnLiklihoodAdjust = 0.0f;
+
     // Start is called before the first frame update
     void Start()
     {
-        
     }
 
     Vector3 rollRandomPos(Vector3 scale)
@@ -41,15 +42,24 @@ public class Spawner : MonoBehaviour
         //float successChance = Time.deltaTime * spawnsPerSecond;
         float roll = Random.Range(0.0f, succeedEvery);
         coolDown -= Time.deltaTime;
+        bool force = coolDown < -(3.0f/spawnsPerSecond);
 
-        if ( roll < 1.0f && coolDown <= 0.0f )
+        if (force ||( roll < 1.0f && coolDown <= 0.0f ))
         {
             GameObject obj;
-            bool goodGuy = Random.Range(0.0f, 1.0f) <= goodChance;
+            bool goodGuy = Random.Range(0.0f, 1.0f) <= goodChance + spawnLiklihoodAdjust;
             if (goodGuy)
+            {
                 obj = Instantiate(goodGuyPrefab);
+                // Increase spawn chance of bad guy or reset it to zero if in favour of us
+                spawnLiklihoodAdjust = Mathf.Min(spawnLiklihoodAdjust - 0.1f, 0.0f);
+            }
             else
+            {
                 obj = Instantiate(badGuyPrefab);
+                // Increase spawn chance of good guy or reset it to zero if in favour of us
+                spawnLiklihoodAdjust = Mathf.Max(spawnLiklihoodAdjust + 0.1f, 0.0f);
+            }
             Vector3 pos = rollRandomPos(obj.GetComponent<SpriteRenderer>().bounds.size);
             obj.transform.position = obj.transform.worldToLocalMatrix * pos;
             

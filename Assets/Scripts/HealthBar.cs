@@ -11,6 +11,7 @@ public class HealthBar : MonoBehaviour
     public float depletionRate = 0.05f;
     public float damageAmount = 0.2f;
     public float nutritionAdd = 0.1f;
+    public float gracePeriod = 3.0f;
 
     public void Damage()
     {
@@ -36,6 +37,12 @@ public class HealthBar : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
+        if(gracePeriod >= 0.0)
+        {
+            gracePeriod -= Time.deltaTime;
+            return;
+        }
+
         currentNutrition = Mathf.Clamp01(currentNutrition);
         currentNutrition -= depletionRate * Time.deltaTime;
         

@@ -8,7 +8,7 @@ public class Score : MonoBehaviour
 {
     public TextMeshProUGUI scoreDisplay;
     public float scoreFeelBetterMultiplier = 100f;
-    public static float score = 0.0f; 
+    public static float score = 0.0f;
     // Start is called before the first frame update
     void Start()
     {
@@ -17,6 +17,7 @@ public class Score : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
+      
         Debug.Log("Score update");
         score += Time.deltaTime * scoreFeelBetterMultiplier;
         Debug.Log(score);

@@ -225,7 +225,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   accelerometerUpdateInterval: 0.016666668
   lowPassKernelWidthInSeconds: 1
-  tiltAdjust: 12
+  tiltAdjust: 10
   responsiveness: 1
   widthVariation: 0
   stepVariation: 0
@@ -737,9 +737,10 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   currentNutrition: 1
-  depletionRate: 0.05
+  depletionRate: 0.1
   damageAmount: 0.2
-  nutritionAdd: 0.1
+  nutritionAdd: 0.05
+  gracePeriod: 3
 --- !u!1 &1099300367
 GameObject:
   m_ObjectHideFlags: 0
@@ -990,8 +991,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b5348d4e23b81824ab5d183bd9ee063c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  spawnsPerSecond: 2
-  goodChance: 0.5
+  spawnsPerSecond: 4
+  goodChance: 0.66
   borderPercent: 0.1
   goodGuyPrefab: {fileID: 7704297299948419546, guid: fdcb1340d8ebdd944bda50887230d253, type: 3}
   badGuyPrefab: {fileID: 8959809473533492466, guid: 61179e519c5bdc14492a002509b5f1b7, type: 3}
