@@ -1,8 +1,9 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
-public class ObjectScrollUp : MonoBehaviour
+public class Help : MonoBehaviour
 {
     // Start is called before the first frame update
     void Start()
@@ -13,12 +14,10 @@ public class ObjectScrollUp : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        transform.position += Spawner.spawnedObjectSpeed * Time.deltaTime * Vector3.up;
     }
 
-    void OnBecameInvisible()
+    public void ButtonClicked()
     {
-        Destroy(gameObject);
+        SceneManager.LoadScene("HowTo", LoadSceneMode.Single);
     }
-
 }

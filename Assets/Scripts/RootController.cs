@@ -15,9 +15,9 @@ public class RootController : MonoBehaviour
     public Camera cameraView;
     public float speed = 0.1f;
     public float colliderHeight = 0.1f;
-
+    public bool backgroundSpeed = false;
     public HealthBar healthBar;
-
+    
     private float finalWidth;
     private float[] targetPercentage;
     private float lowPassFilterFactor;
@@ -25,7 +25,7 @@ public class RootController : MonoBehaviour
     private float totalRootLength;
     private float stepSize;
     private int newestIndex = 0;
-
+    private float accumulatedStep = 0.0f;
 
 
     [Serializable]
@@ -93,13 +93,13 @@ public class RootController : MonoBehaviour
         if (SystemInfo.supportsAccelerometer)
         {
             tilt = Input.acceleration.x * tiltAdjust;
+            tilt = Mathf.Lerp(lastTilt, tilt, lowPassFilterFactor);
+            lastTilt = tilt;
         }
         else
         {
             tilt = Input.GetAxis("Horizontal");
         }
-        tilt = Mathf.Lerp(lastTilt, tilt, lowPassFilterFactor);
-        lastTilt = tilt;
         tilt *= responsiveness;
 
 
@@ -113,10 +113,23 @@ public class RootController : MonoBehaviour
         newX = Mathf.Clamp(newX, left + maxWidth / 2, right - maxWidth / 2);
 
 
-        AnimationCurve curve = new AnimationCurve();
+        //AnimationCurve curve = new AnimationCurve();
 
-        int shift = (int)Mathf.Round((totalRootLength * Time.deltaTime * speed) / stepSize);
-        shift = Math.Max(1, shift);
+        float usedSpeed = backgroundSpeed ? Spawner.spawnedObjectSpeed : speed;
+        accumulatedStep += usedSpeed * Time.deltaTime;
+        int shift = (int)Mathf.Floor((accumulatedStep) / stepSize);
+        accumulatedStep -= shift * stepSize;
+
+        LineRenderer renderer = GetComponent<LineRenderer>();
+
+        if (shift == 0)
+        {
+            Point p = points[points.Count - 1];
+            p.x = newX;
+            points[points.Count - 1] = p;
+            renderer.SetPosition(0, new Vector3(newX, startHeight));
+            return;
+        }
 
         newestIndex += shift;
 
@@ -152,7 +165,7 @@ public class RootController : MonoBehaviour
                 float midX = Mathf.Lerp(newer.x, newer.x, t);
                 float midW = Mathf.Lerp(newer.width, newer.width, t);
                 points[pIdx - 1] = new Point(newestIndex - numPositions - 1, midX, midW);
-                curve.AddKey(1.0f, midW * targetPercentage[numPositions - 1]);
+                //curve.AddKey(1.0f, midW * targetPercentage[numPositions - 1]);
             }
 
             for (int outIdx = invertedNewIndex; outIdx <= invertedOldIndex; outIdx++)
@@ -161,37 +174,33 @@ public class RootController : MonoBehaviour
                 positions[outIdx] = new Vector3(Mathf.Lerp(newer.x, older.x, (float)outIdx / (invertedOldIndex - invertedNewIndex)), startHeight + outIdx * stepSize, 0.0f);
             }
 
-            curve.AddKey((float)invertedNewIndex / (numPositions - 1), newer.width * targetPercentage[invertedNewIndex]);
+            //Keyframe frame = new Keyframe((float)invertedNewIndex / (numPositions - 1), newer.width * targetPercentage[invertedNewIndex]);
+            //frame.inTangent = 1;
+            //frame.outTangent = 1;
+            //curve.AddKey(frame);
         }
 
 
 
-        LineRenderer renderer = GetComponent<LineRenderer>();
         renderer.SetPositions(positions);
         var newPos = new Vector3(newX, transform.position.y, transform.position.z);
         Vector2 direction = (newPos - transform.position).normalized;
         float angle = Mathf.Atan2(direction.y, direction.x) * Mathf.Rad2Deg;
 
         int steps = (int)(colliderHeight / stepSize);
-        float colliderWidth = renderer.widthCurve.Evaluate((float)steps / (numPositions-1));
 
-        Vector3 tipPos = positions[positions.Length - 1];
-        Vector3 backPos = positions[positions.Length - 1 - steps];
-        Vector3 pointToBack = tipPos - backPos;
+        int numColliderPoints = steps * 2;
+        int midPoint = steps - 1;
+        Vector2[] colliderPoints = new Vector2[numColliderPoints];
+        for(int i = steps - 1; i >= 0; i-- )
+        {
+            Vector3 pos = positions[i];
+            float colliderWidth = renderer.widthCurve.Evaluate((float)i / (numPositions - 1));
+            colliderPoints[midPoint + 1 + i] = new Vector3(pos.x - colliderWidth / 2, stepSize * i);
+            colliderPoints[midPoint - i] = new Vector3(pos.x + colliderWidth / 2, stepSize * i);
+        }
 
-        Vector3 perp = Vector3.Cross(pointToBack, Vector3.forward).normalized;
-        Vector3 rightTri = pointToBack + perp * colliderWidth / 2;
-        Vector3 leftTri = pointToBack - perp * colliderWidth / 2;
-
-
-        GetComponent<PolygonCollider2D>().points = new Vector2[] { 
-            leftTri,
-            Vector2.zero, 
-            rightTri, 
-        };
-
-        transform.position = newPos;
-        //renderer.widthCurve = curve;
+        GetComponent<PolygonCollider2D>().points = colliderPoints;
 
 
 

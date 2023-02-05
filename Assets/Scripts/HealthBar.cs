@@ -41,7 +41,7 @@ public class HealthBar : MonoBehaviour
         
         if (currentNutrition < 0)
         {
-            SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
+            SceneManager.LoadScene("GameOver", LoadSceneMode.Single);
         }
 
         healthBarTop.fillAmount = Mathf.Clamp01(currentNutrition);

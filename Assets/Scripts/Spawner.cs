@@ -6,7 +6,7 @@ public class Spawner : MonoBehaviour
 {
     public float spawnsPerSecond = 2.0f; // Num items per second
     public float goodChance = 0.5f;
-    public float spawnedObjectSpeed = 4.0f;
+    public static float spawnedObjectSpeed = 2.0f;
     private float coolDown = 0;
     public float borderPercent = 0.1f;
     
@@ -50,7 +50,6 @@ public class Spawner : MonoBehaviour
                 obj = Instantiate(goodGuyPrefab);
             else
                 obj = Instantiate(badGuyPrefab);
-            obj.GetComponent<ObjectScrollUp>().speed = spawnedObjectSpeed;
             Vector3 pos = rollRandomPos(obj.GetComponent<SpriteRenderer>().bounds.size);
             obj.transform.position = obj.transform.worldToLocalMatrix * pos;
             

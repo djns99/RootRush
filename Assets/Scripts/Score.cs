@@ -8,7 +8,7 @@ public class Score : MonoBehaviour
 {
     public TextMeshProUGUI scoreDisplay;
     public float scoreFeelBetterMultiplier = 100f;
-    float score = 0.0f; 
+    public static float score = 0.0f; 
     // Start is called before the first frame update
     void Start()
     {
